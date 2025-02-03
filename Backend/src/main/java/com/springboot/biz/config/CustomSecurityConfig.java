@@ -13,6 +13,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.springboot.biz.security.handler.APILoginFailHandler;
+import com.springboot.biz.security.handler.APILoginSuccessHandler;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -36,6 +39,8 @@ public class CustomSecurityConfig {
 		
 		http.formLogin(config -> {
 			config.loginPage("/api/member/login");
+			config.successHandler(new APILoginSuccessHandler());
+			config.failureHandler(new APILoginFailHandler());
 		});
 		
 		return http.build();

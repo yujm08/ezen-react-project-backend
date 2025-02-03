@@ -54,5 +54,4 @@ public class MemberDTO extends User{
 		return dataMap;
 	}
 	
-	
 }
