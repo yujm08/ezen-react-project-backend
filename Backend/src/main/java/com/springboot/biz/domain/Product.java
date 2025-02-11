@@ -36,6 +36,10 @@ public class Product {
 	
 	private boolean delflag;
 	
+	public void changeDel(boolean delFlag) {
+		this.delflag = delFlag;
+	}
+	
 	@ElementCollection //값 타입 객체, 하나의 상품 데이터가 여러 개의 상품 이미지를 가질 수 있도록 컬렉션 타입으로 했다.
 	//엔티티 테이블은 product, 내장 객체(테이블)가 2 개의 테이블을 처리할 때 한번에 모든 테이블을 같이 로딩해서 퍼리 : eager Loding
 	//2 개의 테이블 중 필요한 타입을 먼저 조획 -> Lazy Loading
@@ -51,7 +55,7 @@ public class Product {
 	}
 	
 	public void changeName(String name) {
-		this.pdesc = name;
+		this.pname = name;
 	}
 	
 	public void addImage(ProductImage image) {

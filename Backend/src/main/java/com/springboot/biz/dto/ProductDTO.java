@@ -19,7 +19,7 @@ public class ProductDTO {
 	//상품의 고유 번호 (ID)
 	private Long pno;
 	
-	private String name;
+	private String pname;
 	
 	private int price;
 	
