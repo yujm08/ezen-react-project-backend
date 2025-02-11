@@ -117,7 +117,7 @@ public class CustomFileUtil { //파일 데이터의 입출력 담당
     		resource = new FileSystemResource(uploadPath + File.separator + "123.jpg");
     	}
     	
-    	//HttpHeaders 를 이욯해서 해당 파일의 MIME 유형을 추가
+    	//HttpHeaders 를 이용해서 해당 파일의 MIME 유형을 추가
     	//heders 를 통해서 MIME 유형을 추가해 주지 않으면 클라이언트가 서버로 전송하는 데이터의 형식을 정학히 인식할 수 X
     	//-> 파일이나 이미지가 깨짐
     	HttpHeaders headers = new HttpHeaders();
