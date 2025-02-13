@@ -42,22 +42,18 @@ public class ProductService {
 		Page<Object[]> result = productRepository.selectList(pageable);
 		
 		List<ProductDTO> dtoList = result.get().map(arr -> {
-				
-			Product product = (Product) arr[0];
-			ProductImage productImage = (ProductImage) arr[1];
-			
-			ProductDTO productDTO = ProductDTO.builder()
-					.pno(product.getPno())
-					.pname(product.getPname())
-					.pdesc(product.getPdesc())
-					.price(product.getPrice())
-					.build();
-			
-			String imageStr = productImage.getFileName();
-			productDTO.setUploadFileNames(List.of(imageStr));
-				
-			return productDTO;		
-				
+		    Product product = (Product) arr[0];
+		    ProductImage productImage = (ProductImage) arr[1];
+		    
+		    ProductDTO productDTO = ProductDTO.builder()
+		            .pno(product.getPno())
+		            .pname(product.getPname())
+		            .pdesc(product.getPdesc())
+		            .price(product.getPrice())
+		            .uploadFileNames(productImage != null ? List.of(productImage.getFileName()) : List.of()) //NULL 체크
+		            .build();
+		    
+		    return productDTO;        
 		}).collect(Collectors.toList());
 		
 		long totalCount = result.getTotalElements();
@@ -150,6 +146,7 @@ public class ProductService {
 		product.changeName(productDTO.getPname());
 		product.changeDesc(productDTO.getPdesc());
 		product.changePrice(productDTO.getPrice());
+		product.changeDel(productDTO.isDelflag());
 		
 		product.clearList();
 		
@@ -166,8 +163,16 @@ public class ProductService {
 	}
 	
 	//삭제
+	@Transactional
 	public void remove(Long pno) {
-		productRepository.updateToDelete(pno, true);
+	    try {
+	        log.info("삭제 처리 시작 - pno: " + pno);
+	        productRepository.updateToDelete(pno, true);
+	        log.info("삭제 처리 완료 - pno: " + pno);
+	    } catch(Exception e) {
+	        log.error("삭제 처리 중 에러 발생: " + e.getMessage());
+	        throw new RuntimeException("삭제 처리 중 오류가 발생했습니다.");
+	    }
 	}
 	
 }

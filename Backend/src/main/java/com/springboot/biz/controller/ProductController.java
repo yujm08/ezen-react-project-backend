@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,6 +50,7 @@ public class ProductController {
 		
 		Long pno = productService.register(productDTO);
 		
+		log.info("응답 값: " + Map.of("result", pno));
 		return Map.of("result", pno);
 		
 	}
@@ -70,14 +72,14 @@ public class ProductController {
     }
 	
 	//상세 보기
-	@PostMapping("/{pno}")
+	@GetMapping("/{pno}")
 	public ProductDTO read(@PathVariable(name="pno") Long pno) {
 		log.info("-----------------상품 상세 조회 요청: pno={}", pno);
 		return productService.get(pno);
 	}
 	
 	//수정
-	@PostMapping("/{pno}")
+	@PutMapping("/{pno}")
 	public Map<String, String> modify(@PathVariable(name="pno") Long pno, ProductDTO productDTO) {
 		
 		productDTO.setPno(pno);
@@ -93,7 +95,7 @@ public class ProductController {
 			uploadFileNames.addAll(currentUploadFileNames);
 		}
 		
-		productService.modify(oldProductDTO);
+		productService.modify(productDTO);
 		
 		if(oldFileNames != null && oldFileNames.size() > 0) {
 			
@@ -107,9 +109,17 @@ public class ProductController {
 		return Map.of("RESULT", "SUCCESS");
 	}
 	
+	
 	@DeleteMapping("/{pno}")
-    public Map<String, String> remove(@PathVariable Long pno) {
-        productService.remove(pno);
-        return Map.of("RESULT", "SUCCESS-deleted");
-    }
+	public ResponseEntity<Map<String, String>> remove(@PathVariable(name="pno") Long pno) {
+	    try {
+	        log.info("삭제 요청 - pno: " + pno);
+	        productService.remove(pno);
+	        return ResponseEntity.ok(Map.of("RESULT", "SUCCESS"));
+	    } catch(Exception e) {
+	        log.error("삭제 실패: " + e.getMessage());
+	        return ResponseEntity.internalServerError()
+	            .body(Map.of("RESULT", "ERROR", "message", e.getMessage()));
+	    }
+	}
 }
