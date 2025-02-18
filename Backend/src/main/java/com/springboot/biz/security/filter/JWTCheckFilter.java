@@ -37,6 +37,10 @@ public class JWTCheckFilter extends OncePerRequestFilter{
 		    return true;
 		}
 		
+		if(path.equals("/api/member/refresh")) {
+		    return true;
+		}
+		
 		//api/member/ 경로의 호출은 체크 X
 		if(path.startsWith("/api/member/")) {
 			return true;
@@ -67,10 +71,10 @@ public class JWTCheckFilter extends OncePerRequestFilter{
 			String email = (String) claims.get("email");
 			String pw = (String) claims.get("pw");
 			String nickname = (String) claims.get("nickname");
-			Boolean socail = (Boolean) claims.get("socail");
+			Boolean social = (Boolean) claims.get("social");
 			List<String> roleNames = (List<String>) claims.get("roleNames");
 			
-			MemberDTO memberDTO = new MemberDTO(email, pw, nickname, socail.booleanValue(), roleNames);
+			MemberDTO memberDTO = new MemberDTO(email, pw, nickname, social.booleanValue(), roleNames);
 			
 			log.info("----------------------------");
 			log.info(memberDTO);

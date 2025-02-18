@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.springboot.biz.util.CustomJWTException;
@@ -18,14 +19,20 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class APIRefreashController {
 
-	@RequestMapping
-	public Map<String, Object> refresh(@RequestHeader("Authorization") String authHeader, String refreshToken) {
+	@RequestMapping("/api/member/refresh")
+	public Map<String, Object> refresh(@RequestHeader("Authorization") String authHeader, @RequestParam("refreshToken") String refreshToken) {
+		
+		log.info("Received refresh request");
+	    log.info("Authorization header: " + authHeader);
+	    log.info("Refresh token: " + refreshToken);
 		
 		if(refreshToken == null) {
+			log.error("NULL_REFRESH_TOKEN");
 			throw new CustomJWTException("NULL_REFREASH");
 		}
 		
 		if(authHeader == null || authHeader.length() < 7) {
+			log.error("INVALID_AUTH_HEADER: " + authHeader);
 			throw new CustomJWTException("INVALID_STRING");
 		}
 		
@@ -33,6 +40,7 @@ public class APIRefreashController {
 		
 		//Access 토큰이 만료되지 않았을 경우
 		if(checkExpiredToken(accessToken) == false) {
+			log.info("Access token is still valid, returning the same tokens");
 			return Map.of("accessToken", accessToken, "refreshToken", refreshToken);
 		}
 		
@@ -41,7 +49,7 @@ public class APIRefreashController {
 		log.info("refresh . . . claims: " + claims);
 		String newAccessToken = JWTUtil.generateToken(claims, 10);
 		String newRefreshToken = checkTime((Integer)claims.get("exp")) == true ? JWTUtil.generateToken(claims, 60*24) : refreshToken;
-		return Map.of("accessToken", accessToken, "refreshToken", refreshToken);
+		return Map.of("accessToken", newAccessToken, "refreshToken", newRefreshToken);
 	}
 	
 	//시간이 1시간 미만으로 남았다면
@@ -61,6 +69,7 @@ public class APIRefreashController {
 			JWTUtil.validateToken(token);
 		}catch(Exception e) {
 			if(e.getMessage().equals("Expired")) {
+				log.error("Error during check Expired Token", e);
 				return true;
 			}
 		}
